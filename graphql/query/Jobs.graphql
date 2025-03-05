@@ -1,0 +1,46 @@
+query MyQuery($filter: jobs_bool_exp, $limit: Int, $offset: Int) {
+  jobs_aggregate(where: $filter) {
+    aggregate {
+      count(distinct: true)
+    }
+  }
+  jobs(limit: $limit, offset: $offset, where: $filter) {
+    id
+    expired
+    total_web_view_count
+    telegram_view_count
+    summary
+    deadline
+    total_view_count
+    years_of_experience
+    max_years_of_experience
+    type
+    position {
+      name
+      id
+      sub_sectors_positions_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+    job_cities {
+      city {
+        name
+      }
+    }
+    entity {
+      logo
+      name
+    }
+    sub_sector {
+      id
+      name
+      sector {
+        id
+        name
+        description
+      }
+    }
+  }
+}

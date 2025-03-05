@@ -1,0 +1,6 @@
+query MyQuery {
+  basic_cities(order_by: { name: asc }, limit: 10, offset: 1) {
+    name
+    id
+  }
+}

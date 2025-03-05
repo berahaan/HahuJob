@@ -1,0 +1,6 @@
+query GET_BASIC_SECTORS {
+  basic_positions(order_by: { name: asc }, limit: 10, offset: 1) {
+    name
+    id
+  }
+}

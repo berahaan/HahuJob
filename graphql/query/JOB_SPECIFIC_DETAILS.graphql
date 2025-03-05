@@ -1,0 +1,51 @@
+query MyQuery($JobId: String!) {
+  job(id: $JobId) {
+    type
+    view_count
+    title
+    total_view_count
+    total_web_view_count
+    telegram_view_count
+    years_of_experience
+    max_years_of_experience
+    approved_on
+    deadline
+    type
+    description
+    job_cities {
+      city {
+        name
+      }
+    }
+    job_fields_of_study {
+      field_of_study {
+        name
+      }
+    }
+    entity {
+      id
+      name
+      logo
+    }
+    position {
+      name
+      sub_sectors_positions_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+    sub_sector {
+      id
+      name
+      sector {
+        name
+      }
+    }
+    job_skills {
+      skill {
+        name
+      }
+    }
+  }
+}

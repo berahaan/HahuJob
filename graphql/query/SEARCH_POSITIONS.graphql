@@ -1,0 +1,9 @@
+query GET_BASIC_SECTORS($PositionSrch: String) {
+  basic_positions(
+    order_by: { name: asc }
+    where: { name: { _ilike: $PositionSrch } }
+  ) {
+    name
+    id
+  }
+}

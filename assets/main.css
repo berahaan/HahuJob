@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer utilities {
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+    display: flex;
+    width: calc(200% + 0.5rem);
+  }
+}
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 100%;
+  /* No overflow-y setting here */
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+/* Scrollbar width */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: #009688;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #009688;
+  border-radius: 2px;
+  border: 1px solid #00796b;
+}

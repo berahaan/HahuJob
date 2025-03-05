@@ -1,0 +1,11 @@
+query MyQuery($CityName: String) {
+  basic_cities(
+    order_by: { name: asc }
+    limit: 14
+    offset: 1
+    where: { name: { _ilike: $CityName } }
+  ) {
+    name
+    id
+  }
+}

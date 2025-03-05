@@ -1,0 +1,65 @@
+query FetchJobsBySectors(
+  $SelectedRegion: [String!]!
+  $limit: Int
+  $offset: Int
+) {
+  basic_sectors(limit: 3, offset: 1) {
+    name
+    description
+    sub_sectors(limit: 2) {
+      id
+      name
+      jobs(
+        limit: $limit
+        offset: $offset
+        where: {
+          job_cities: { city: { region: { id: { _in: $SelectedRegion } } } }
+        }
+      ) {
+        id
+        expired
+        deadline
+        total_web_view_count
+        telegram_view_count
+        summary
+        total_view_count
+        max_years_of_experience
+        years_of_experience
+        type
+        position {
+          name
+          sub_sectors_positions_aggregate {
+            aggregate {
+              count
+            }
+          }
+        }
+        entity {
+          logo
+          name
+        }
+        job_cities(
+          where: { city: { region: { id: { _in: $SelectedRegion } } } }
+        ) {
+          city {
+            id
+            name
+            region {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+  jobs_aggregate(
+    where: {
+      job_cities: { city: { region: { id: { _in: $SelectedRegion } } } }
+    }
+  ) {
+    aggregate {
+      count(distinct: true)
+    }
+  }
+}

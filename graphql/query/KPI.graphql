@@ -1,0 +1,65 @@
+query job_kpi($JobId: String!) {
+  job(id: $JobId) {
+    id
+    title
+    entity {
+      name
+    }
+    area {
+      id
+      name
+      city {
+        name
+      }
+    }
+    job_fields_of_study {
+      field_of_study {
+        name
+      }
+    }
+    sub_sector {
+      id
+      name
+      sector {
+        id
+        name
+      }
+    }
+    salary
+    minimum_education_level {
+      id
+      name
+    }
+    maximum_education_level {
+      id
+      name
+    }
+    gender_priority
+    job_skills {
+      skill {
+        name
+      }
+    }
+    scraped_at
+    posted_on
+    deadline
+    application_method
+    job_application_city {
+      name
+    }
+    job_application_woreda_town {
+      name
+    }
+    job_cities {
+      city {
+        name
+      }
+    }
+    how_to_apply
+    source
+    url
+    is_online
+    summary
+    amharic_summary
+  }
+}

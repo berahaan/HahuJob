@@ -1,0 +1,39 @@
+query FetchJobsBySectors($SectorID: String!, $PositionName: String) {
+  basic_sectors(where: { id: { _eq: $SectorID } }) {
+    name
+    description
+    sub_sectors(limit: 1, offset: 0) {
+      id
+      name
+      jobs(limit: 1, offset: 0) {
+        id
+        expired
+        deadline
+        total_web_view_count
+        telegram_view_count
+        summary
+        total_view_count
+        max_years_of_experience
+        years_of_experience
+        type
+        position {
+          name
+          sub_sectors_positions_aggregate {
+            aggregate {
+              count
+            }
+          }
+        }
+        entity {
+          logo
+          name
+        }
+      }
+      jobs_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+  }
+}

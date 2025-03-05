@@ -1,0 +1,6 @@
+query MyQuery($name: String) {
+  basic_region_cities(where: { name: { _ilike: $name } }) {
+    id
+    name
+  }
+}

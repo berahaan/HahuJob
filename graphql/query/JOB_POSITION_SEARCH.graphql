@@ -1,0 +1,18 @@
+query FetchJobsBySectors($Position: String) {
+  basic_sectors {
+    sub_sectors(limit: 1, offset: 0) {
+      jobs(
+        limit: 10
+        offset: 0
+        where: { position: { name: { _ilike: $Position } } }
+        order_by: { position: { name: asc } }
+      ) {
+        id
+        position {
+          id
+          name
+        }
+      }
+    }
+  }
+}

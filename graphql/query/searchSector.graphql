@@ -1,0 +1,7 @@
+query MyQuery($SectorId: String) {
+  basic_sectors(where: { id: { _eq: $SectorId } }) {
+    id
+    description
+    name
+  }
+}

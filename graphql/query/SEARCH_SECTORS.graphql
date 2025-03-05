@@ -1,0 +1,9 @@
+query MyQuery($SectorName: String) {
+  basic_sectors(
+    order_by: { name: asc }
+    where: { name: { _ilike: $SectorName } }
+  ) {
+    id
+    name
+  }
+}

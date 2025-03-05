@@ -1,0 +1,56 @@
+query FetchJobsBySectors(
+  $greater: smallint
+  $less: smallint
+  $limit: Int
+  $offset: Int
+) {
+  basic_sectors(limit: 3, offset: 0) {
+    name
+    description
+    sub_sectors(limit: 1, offset: 0) {
+      id
+      name
+      jobs(
+        limit: $limit
+        offset: $offset
+        where: { years_of_experience: { _gte: $greater, _lte: $less } }
+      ) {
+        id
+        expired
+        deadline
+        total_web_view_count
+        telegram_view_count
+        summary
+        total_view_count
+        max_years_of_experience
+        years_of_experience
+        type
+        position {
+          name
+          sub_sectors_positions_aggregate {
+            aggregate {
+              count
+            }
+          }
+        }
+        job_cities {
+          city {
+            id
+            name
+          }
+        }
+        entity {
+          logo
+          name
+        }
+      }
+      jobs_aggregate(
+        where: { years_of_experience: { _gte: $greater, _lte: $less } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+query job_analysis($JobID: String!) {
+  job(id: $JobID) {
+    esco_uri
+    isco_08 {
+      isco_08_code
+      level
+      title_am
+      title_en
+      tasks_include
+      definition
+      excluded_occupations
+      parent {
+        isco_08_code
+        title_am
+        title_en
+        level
+        parent {
+          level
+          title_am
+          title_en
+          isco_08_code
+          parent {
+            isco_08_code
+            level
+            title_am
+            title_en
+          }
+        }
+      }
+    }
+    soc_2010 {
+      title
+      onetsoc_code
+      alternate_titles(limit: 3) {
+        alternate_title
+      }
+      description
+      technology_skills {
+        example
+        commodity_code
+        unspsc_reference {
+          commodity_title
+          commodity_code
+        }
+      }
+      task_statements {
+        task
+      }
+      skills {
+        content_model_reference {
+          element_name
+        }
+        data_value
+        scale_id
+        scales_reference {
+          maximum
+          minimum
+        }
+      }
+      knowledge {
+        content_model_reference {
+          element_name
+        }
+        data_value
+        scale_id
+        scales_reference {
+          maximum
+          minimum
+        }
+      }
+      abilities {
+        content_model_reference {
+          element_name
+        }
+        data_value
+        scale_id
+        scales_reference {
+          maximum
+          minimum
+        }
+      }
+    }
+  }
+}

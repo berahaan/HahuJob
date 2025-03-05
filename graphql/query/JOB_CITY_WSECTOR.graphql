@@ -1,0 +1,49 @@
+query FetchJobsBySectors($CityID: String, $limit: Int, $offset: Int) {
+  basic_sectors {
+    name
+    description
+    sub_sectors(limit: 1, offset: 0) {
+      id
+      name
+      jobs(
+        limit: $limit
+        offset: $offset
+        where: { job_cities: { city: { id: { _eq: $CityID } } } }
+      ) {
+        id
+        expired
+        deadline
+        total_web_view_count
+        telegram_view_count
+        summary
+        total_view_count
+        max_years_of_experience
+        years_of_experience
+        type
+        position {
+          name
+          sub_sectors_positions_aggregate {
+            aggregate {
+              count
+            }
+          }
+        }
+        job_cities {
+          city {
+            id
+            name
+          }
+        }
+        entity {
+          logo
+          name
+        }
+      }
+    }
+  }
+  jobs_aggregate(where: { job_cities: { city: { id: { _eq: $CityID } } } }) {
+    aggregate {
+      count
+    }
+  }
+}
