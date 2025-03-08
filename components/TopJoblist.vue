@@ -2,6 +2,7 @@
 import BASIC_POSITIONS from "~/graphql/query/BASIC_POSITIONS.graphql";
 import BASIC_SECTORS from "~/graphql/query/BASIC_SECTORS.graphql";
 import BASIC_CITY from "~/graphql/query/BASIC_CITY.graphql";
+const seachQuery = ref();
 const {
   closeMainSearch,
   hndlMnInptSrch,
@@ -22,6 +23,14 @@ const togglePositions = () => {
   storeJobFilters.isCityOpen = false;
   storeJobFilters.isTitleClicked = false;
 };
+const checkSearchInputs = computed(() => {
+  let conditions = [];
+  if (seachQuery.value) {
+    console.log("new values exist for this search query");
+    conditions.push(seachQuery.value);
+  }
+  return conditions;
+});
 const toggleCity = () => {
   storeJobFilters.isCityOpen = !storeJobFilters.isCityOpen;
   storeJobFilters.isPositionOpen = false;

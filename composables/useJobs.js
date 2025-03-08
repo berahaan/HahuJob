@@ -74,7 +74,7 @@ export const useJobs = () => {
       }
     } else {
       console.log("input is clear now ...");
-      // storeJobFilters.basicSectors = [];
+      
     }
   };
   const hndlMnInptSrch = async () => {
@@ -126,16 +126,9 @@ export const useJobs = () => {
     });
 
     filterControllers.value.sectorId = id;
-    state.filters.sub_sector = {
-      sector: {
-        id: {
-          _eq: route.query.sid,
-        },
-      },
-    };
     // Ensure reactivity kicks in after navigation
     await nextTick();
-    buildFilters();
+
     await fetchSectors(id);
     console.log("Now going to refresh after handling sector ID");
     // await refresh();
@@ -157,42 +150,11 @@ export const useJobs = () => {
       },
     });
     // Update filters
-    buildFilters();
+
     await fetchJobs();
     // await refresh();
   };
-  // functions to buld
-  const buildFilters = () => {
-    console.log("insides build filters");
-    const filters = {};
-    if (route.query.sid) {
-      filters.sub_sector = {
-        sector: {
-          id: {
-            _eq: route.query.sid,
-          },
-        },
-      };
-    }
-    if (route.query.pid) {
-      filters.position = {
-        id: {
-          _eq: route.query.pid,
-        },
-      };
-    } else if (route.query.cid) {
-      console.log("yes cid is presents now ...");
-      filters.job_cities = {
-        city: {
-          id: {
-            _eq: route.query.cid,
-          },
-        },
-      };
-    }
-    state.filters = filters;
-    console.log("filters ", filters);
-  };
+
   // searching Positions search when a users is searchning for specific jobs
   const HandlePositionInput = async () => {
     if (topJoblist.PositionSearch) {
@@ -209,7 +171,7 @@ export const useJobs = () => {
       }
     } else {
       console.log("input is clear ...");
-      buildFilters();
+
       await fetchJobs();
       // basicPositions.value = [];
     }
@@ -225,9 +187,6 @@ export const useJobs = () => {
         page: 1,
       },
     });
-
-    // Update filters
-    buildFilters();
     await fetchJobs();
   };
   const HandLeCitySearch = async () => {
@@ -269,6 +228,50 @@ export const useJobs = () => {
       console.log("error ", error);
     }
   };
+  // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // functions to buld
+  const buildFilters = computed(() => {
+    console.log("inside build filters");
+    const filters = {};
+    if (filterControllers.value.sectorId) {
+      console.log("sectors Id ....", filterControllers.value.sectorId);
+      filters.sub_sector = {
+        sector: {
+          id: {
+            _eq: filterControllers.value.sectorId,
+          },
+        },
+      };
+    }
+    if (filterControllers.value.positionId) {
+      console.log("PID ", filterControllers.value.positionId);
+      filters.position = {
+        id: {
+          _eq: filterControllers.value.positionId,
+        },
+      };
+    } else if (filterControllers.value.cityId) {
+      console.log("yes cid is present now ...");
+      filters.job_cities = {
+        city: {
+          id: {
+            _eq: filterControllers.value.cityId,
+          },
+        },
+      };
+    }
+
+    console.log("filters", filters);
+    return filters; // Ensure the computed property returns the `filters` object
+  });
+
+  //  Create `variables` as a computed property
+  const variables = computed(() => ({
+    filter: buildFilters.value,
+    limit: 5,
+    offset: 0,
+  }));
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const fetchJobs = async () => {
     console.log("insides fetchJobs");
     state.isLoading = true;
@@ -330,7 +333,7 @@ export const useJobs = () => {
   //Fetch jobs when the component is mounted
   onMounted(async () => {
     console.log("onmounting ....");
-    buildFilters();
+
     // await refresh();
     await fetchSectors(route.query.pid);
     await fetchJobs();
@@ -345,7 +348,7 @@ export const useJobs = () => {
             _eq: newPid,
           },
         };
-        buildFilters();
+
         await fetchJobs();
       }
     }
@@ -361,7 +364,7 @@ export const useJobs = () => {
             },
           },
         };
-        buildFilters();
+
         await fetchJobs();
       }
     }
@@ -381,7 +384,7 @@ export const useJobs = () => {
           },
         };
         // await refresh();
-        buildFilters();
+
         await fetchJobs();
         state.isLoading = false;
       }

@@ -1,20 +1,25 @@
 <script setup>
-const { colorMode } = useColorModeStore();
-const getSkeletonJobs = () => {
-  const skeletonCount = 5; // Number of skeletons to render
-  return Array.from({ length: skeletonCount }, (_, i) => i + 1);
-};
+const seachQuery = ref();
+const filters = computed(() => {
+  console.log("filters is being called now ....");
+  let conditions = [];
+  if (seachQuery.value) {
+    conditions.push(seachQuery.value);
+  }
+  return conditions;
+});
+
+watch(seachQuery, () => {
+  console.log("filters ", filters.value);
+});
 </script>
 
 <template>
-  <div>
-    <div class=" mt-2 ml-7 justify-between">
-      <div
-        class="border border-gray-700 rounded-md w-[400px] h-[80px] flex items-center justify-center bg-gray-600 animate-pulse mb-4"
-      ></div>
-      <div
-        class="border border-gray-700 rounded-md w-[50px] h-[20px] flex items-center justify-center bg-gray-600 animate-pulse mb-4"
-      ></div>
-    </div>
+  <div class="w-[20%] mt-[4rem] flex justify-self-center items-center">
+    <input
+      type="text"
+      v-model="seachQuery"
+      class="border border-gray-400 text-black"
+    />
   </div>
 </template>

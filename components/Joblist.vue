@@ -85,11 +85,12 @@ console.log("state.Jobs ", state.jobs);
               ? 'bg-white hover:border-teal-500 rounded-md border-white'
               : 'bg-gray-800 hover:border-teal-500 rounded-md ',
           ]"
-          class="relative w-[390px] cursor-pointer flex items-center justify-self-center md:w-[34rem] lg:w-[394px] h-[28rem] mb-[1px] border-gray-800 mt-4 rounded-md border hover:border-teal-600"
+          class="relative w-[390px] cursor-pointer flex items-center justify-self-center md:w-[34rem] lg:w-[394px] mb-[1px] border-gray-800 mt-4 rounded-md border hover:border-teal-600"
         >
           <div class="p-4">
             <!-- Job Card Header -->
-            <div class="flex justify-between items-center sticky top-0 z-10">
+
+            <div class="flex justify-between items-center">
               <div class="flex items-center gap-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +133,7 @@ console.log("state.Jobs ", state.jobs);
 
             <!-- Job Card Body -->
             <div
-              class="flex flex-col md:flex-row gap-6 md:mt-7 mt-2"
+              class="flex flex-col md:flex-row gap-6 md:mt-10 mt-2"
               :class="[
                 colorStore.colorMode === 'light'
                   ? 'text-gray-500'
