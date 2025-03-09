@@ -1,8 +1,20 @@
 <script setup>
 import Sidebar from "./Sidebar.vue";
 import TopJoblist from "./TopJoblist.vue";
+import jobsQuery from "../graphql/query/jobs.graphql";
 const colorStore = useColorModeStore();
 const { state, correctTypeNm } = useJobs();
+const { buildFilters } = useJobFIlters();
+
+watch(
+  buildFilters,
+  (newFIlters) => {
+    console.log("build filters inside of jobLists  ", newFIlters);
+  },
+  {
+    immediate: true,
+  }
+);
 const truncateText = (html, limit) => {
   // Remove HTML tags
   const plainText = html?.replace(/<\/?[^>]+(>|$)/g, "") || "";
@@ -11,8 +23,16 @@ const truncateText = (html, limit) => {
     ? plainText.substring(0, limit) + "..."
     : plainText;
 };
-console.log("state.Jobs ", state.jobs);
-// Build filters based on route query
+// call useQuery here for ferching data
+let variables = {
+  limit: 10,
+  offset: 0,
+  filter: buildFilters.value,
+};
+const { data } = useAsyncQuery(jobsQuery, variables);
+watch(data, (newResult) => {
+  console.log("result fetched now ", newResult);
+});
 </script>
 
 <template>

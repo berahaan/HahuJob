@@ -74,7 +74,6 @@ export const useJobs = () => {
       }
     } else {
       console.log("input is clear now ...");
-      
     }
   };
   const hndlMnInptSrch = async () => {
@@ -91,16 +90,6 @@ export const useJobs = () => {
         topJoblist.mainSearchJobs = data.value?.basic_sectors;
         console.log("fetched mainsearch Jobs here ", topJoblist.mainSearchJobs);
         // Filter unique positions
-        topJoblist.mainSearchJobs.forEach((sector) => {
-          sector.sub_sectors.forEach((subSector) => {
-            subSector.jobs.sort((a, b) =>
-              a.position.name.localeCompare(b.position.name)
-            );
-          });
-        });
-
-        uniquePositions.value = getUniquePositions(mainSearchJobs.value);
-        console.log("Unique Positions: ", uniquePositions.value);
       }
     } catch (error) {
       console.log("Error while fetching main searches...", error);
@@ -120,18 +109,16 @@ export const useJobs = () => {
   const handleSectorsId = async (id, name) => {
     storeJobFilters.isTitleClicked = false;
     console.log("Insides handleSectorsId ", id);
+    filterControllers.value.sectorId = id;
     await router.push({
       path: "/jobs",
       query: { ...route.query, sid: id, page: 1 },
     });
 
-    filterControllers.value.sectorId = id;
     // Ensure reactivity kicks in after navigation
-    await nextTick();
 
     await fetchSectors(id);
-    console.log("Now going to refresh after handling sector ID");
-    // await refresh();
+
     await fetchJobs();
   };
 
@@ -217,19 +204,14 @@ export const useJobs = () => {
           sectorId: id,
         },
       });
-      console.log("sector Info responses ", data.value);
-      // storeJobFilters.holdSectorName = data.value?.basic_sectors?.name;
+
       storeJobFilters.holdSectorInfo = data.value?.basic_sectors;
-      console.log(
-        "storeJobFilters.holdSectorInfo ",
-        storeJobFilters.holdSectorInfo
-      );
     } catch (error) {
       console.log("error ", error);
     }
   };
   // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // functions to buld
+  // functions to buld filters to be sent to a graphql .....
   const buildFilters = computed(() => {
     console.log("inside build filters");
     const filters = {};
@@ -265,37 +247,43 @@ export const useJobs = () => {
     return filters; // Ensure the computed property returns the `filters` object
   });
 
-  //  Create `variables` as a computed property
-  const variables = computed(() => ({
-    filter: buildFilters.value,
-    limit: 5,
-    offset: 0,
-  }));
+  watch(filterControllers.value.sectorId, (newId) => {
+    console.log(
+      "Sectors Id being tracked now ",
+      newId,
+      "buildFilters ",
+      buildFilters.value
+    );
+  });
+  watch(buildFilters, (newFilters) => {
+    console.log("buildFilters updated:", newFilters);
+  });
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const fetchJobs = async () => {
     console.log("insides fetchJobs");
     state.isLoading = true;
     try {
       if (route.query.sid) {
-        console.log("to be passed sid ", route.query.sid);
         const { data: sectorName } = await useAsyncQuery({
           query: searchSector,
           variables: {
             SectorId: route.query.sid,
           },
         });
-        console.log("Secrot", sectorName.value);
+
         // storeJobFilters.holdSectorName = data.value?.basic_sectors?.name;
         storeJobFilters.holdSectorName =
           sectorName.value?.basic_sectors[0].name;
         storeJobFilters.holdDescription =
           sectorName.value?.basic_sectors[0].description;
       }
+      console.log("buildFilters.value Inside fetchjobs ", buildFilters.value);
 
       const { data } = await useAsyncQuery({
         query: jobsQuery,
         variables: {
-          filter: state.filters,
+          filter: buildFilters.value,
           limit: state.pagination.pageSize,
           offset: state.pagination.offset,
         },
@@ -332,44 +320,10 @@ export const useJobs = () => {
   };
   //Fetch jobs when the component is mounted
   onMounted(async () => {
-    console.log("onmounting ....");
-
-    // await refresh();
-    await fetchSectors(route.query.pid);
+    await fetchSectors(route.query.sid);
     await fetchJobs();
   });
-  // watch for changes of positions id and updates filters
-  watch(
-    () => route.query.pid,
-    async (newPid, oldPid) => {
-      if (newPid !== oldPid) {
-        state.filters.position = {
-          id: {
-            _eq: newPid,
-          },
-        };
 
-        await fetchJobs();
-      }
-    }
-  );
-  watch(
-    () => route.query.cid,
-    async (newPid, oldPid) => {
-      if (newPid !== oldPid) {
-        state.filters.job_cities = {
-          city: {
-            id: {
-              _eq: newPid,
-            },
-          },
-        };
-
-        await fetchJobs();
-      }
-    }
-  );
-  // Watch for changes in the route query and refetch jobs
   watch(
     () => route.query.sid,
     async (newSid, oldSid) => {
@@ -383,9 +337,8 @@ export const useJobs = () => {
             },
           },
         };
-        // await refresh();
 
-        await fetchJobs();
+        // await fetchJobs();
         state.isLoading = false;
       }
     },
