@@ -1,5 +1,5 @@
 import jobsQuery from "../graphql/query/Jobs.graphql";
-export const useJobFIlters = () => {
+export const useJobFIlters = async () => {
   const filterControllers = ref({
     sectorId: "",
     positionId: "",
@@ -7,16 +7,10 @@ export const useJobFIlters = () => {
   });
   // update sectors id when selected from dropdowns
   const handleSectorClicked = (id, name) => {
-    console.log("clicked");
     console.log("useJobfilters ....", id, name);
     filterControllers.value.sectorId = id;
-    console.log(
-      "filter controllers changed now ",
-      filterControllers.value.sectorId
-    );
   };
   const buildFilters = computed(() => {
-    console.log("inside build filters");
     const filters = {};
     if (filterControllers.value.sectorId) {
       filters.sub_sector = {
@@ -56,6 +50,15 @@ export const useJobFIlters = () => {
     }
   );
 
+  let variables = {
+    filter: buildFilters.value,
+    limit: 10,
+    offset: 0,
+  };
+  const { data } = await useAsyncQuery(jobsQuery, variables);
+  watch(data.value, (data) => {
+    console.log("fetched jobs now ...", data);
+  });
   return {
     filterControllers,
     buildFilters,

@@ -345,7 +345,7 @@ onMounted(async () => {
           :class="[
             colorStore.colorMode === 'light' ? 'text-gray-700 font-bold' : '',
           ]"
-          @click="handleSectorClicked(sector?.id, sector?.name)"
+          @click="handleSectorsId(sector?.id, sector?.name)"
           class="py-2 px-3 cursor-pointer border-b-2 text-[13px]"
         >
           {{ sector?.name }}

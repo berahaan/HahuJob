@@ -11,6 +11,7 @@ export default defineNuxtConfig({
   },
   modules: ["@pinia/nuxt", "vue3-carousel-nuxt", "@nuxtjs/apollo"],
   apollo: {
+    autoImports: true,
     clients: {
       default: {
         httpEndpoint: "https://graph.aggregator.hahujobs.io/v1/graphql",

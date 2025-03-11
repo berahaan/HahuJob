@@ -5,8 +5,9 @@ import SEARCH_SECTORS from "../graphql/query/SEARCH_SECTORS.graphql";
 import SEARCH_POSITIONS from "../graphql/query/SEARCH_POSITIONS.graphql";
 import SEARCH_CITY from "../graphql/query/SEARCH_CITY.graphql";
 import searchSector from "../graphql/query/searchSector.graphql";
-import { useAsyncQuery } from "#imports";
+import { useAsyncQuery, useQuery } from "#imports";
 export const useJobs = () => {
+  const { runWithContext } = useNuxtApp();
   const route = useRoute();
   const router = useRouter();
   // Define pagination inside state
@@ -108,17 +109,13 @@ export const useJobs = () => {
   };
   const handleSectorsId = async (id, name) => {
     storeJobFilters.isTitleClicked = false;
-    console.log("Insides handleSectorsId ", id);
     filterControllers.value.sectorId = id;
     await router.push({
       path: "/jobs",
       query: { ...route.query, sid: id, page: 1 },
     });
 
-    // Ensure reactivity kicks in after navigation
-
     await fetchSectors(id);
-
     await fetchJobs();
   };
 
@@ -247,19 +244,21 @@ export const useJobs = () => {
     return filters; // Ensure the computed property returns the `filters` object
   });
 
-  watch(filterControllers.value.sectorId, (newId) => {
-    console.log(
-      "Sectors Id being tracked now ",
-      newId,
-      "buildFilters ",
-      buildFilters.value
-    );
-  });
-  watch(buildFilters, (newFilters) => {
-    console.log("buildFilters updated:", newFilters);
-  });
-
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  let variables = {
+    filter: state.filters,
+    limit: 10,
+    offset: 0,
+  };
+  runWithContext(() => {
+    const { onResult, onError } = useQuery(jobsQuery, variables);
+    onResult(({ data }) => {
+      console.log("useQuery response data ", data);
+    });
+    onError((error) => {
+      console.error("GraphQL Error:", error.message);
+    });
+  });
   const fetchJobs = async () => {
     console.log("insides fetchJobs");
     state.isLoading = true;
@@ -318,32 +317,12 @@ export const useJobs = () => {
       state.error = error; // Optionally, set an error state
     }
   };
+
   //Fetch jobs when the component is mounted
   onMounted(async () => {
     await fetchSectors(route.query.sid);
     await fetchJobs();
   });
-
-  watch(
-    () => route.query.sid,
-    async (newSid, oldSid) => {
-      if (newSid !== oldSid) {
-        console.log("SID changed from", oldSid, "to", newSid);
-        state.isLoading = true;
-        state.filters.sub_sector = {
-          sector: {
-            id: {
-              _eq: newSid,
-            },
-          },
-        };
-
-        // await fetchJobs();
-        state.isLoading = false;
-      }
-    },
-    { immediate: true }
-  );
 
   return {
     state,

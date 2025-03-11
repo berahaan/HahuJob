@@ -1,20 +1,10 @@
 <script setup>
 import Sidebar from "./Sidebar.vue";
 import TopJoblist from "./TopJoblist.vue";
-import jobsQuery from "../graphql/query/jobs.graphql";
 const colorStore = useColorModeStore();
 const { state, correctTypeNm } = useJobs();
 const { buildFilters } = useJobFIlters();
 
-watch(
-  buildFilters,
-  (newFIlters) => {
-    console.log("build filters inside of jobLists  ", newFIlters);
-  },
-  {
-    immediate: true,
-  }
-);
 const truncateText = (html, limit) => {
   // Remove HTML tags
   const plainText = html?.replace(/<\/?[^>]+(>|$)/g, "") || "";
@@ -24,22 +14,11 @@ const truncateText = (html, limit) => {
     : plainText;
 };
 // call useQuery here for ferching data
-let variables = {
-  limit: 10,
-  offset: 0,
-  filter: buildFilters.value,
-};
-const { data } = useAsyncQuery(jobsQuery, variables);
-watch(data, (newResult) => {
-  console.log("result fetched now ", newResult);
-});
 </script>
 
 <template>
   <div class="flex h-screen">
     <Sidebar />
-    <!-- No Jobs Found (Only shown after loading is complete) -->
-
     <div class="overflow-y-auto h-screen w-full">
       <TopJoblist />
 
