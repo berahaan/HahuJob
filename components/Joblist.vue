@@ -1,23 +1,10 @@
 <script setup>
 import Sidebar from "./Sidebar.vue";
 import TopJoblist from "./TopJoblist.vue";
+import { correctTypeNm, truncateText } from "../utils/textUtils";
 const colorStore = useColorModeStore();
 const { state } = useJobs();
-const truncateText = (html, limit) => {
-  console.log("truncate texts ....");
-  // Remove HTML tags
-  const plainText = html?.replace(/<\/?[^>]+(>|$)/g, "") || "";
-  // Truncate text safely
-  return plainText.length > limit
-    ? plainText.substring(0, limit) + "..."
-    : plainText;
-};
-const correctTypeNm = (type) => {
-  return type
-    .split(/[_\s]+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
-    .join(" ");
-};
+
 // call useQuery here for ferching data
 </script>
 
@@ -28,7 +15,6 @@ const correctTypeNm = (type) => {
       <TopJoblist />
 
       <div
-        v-if="state.jobs.length > 0"
         :class="[
           colorStore.colorMode === 'light'
             ? 'bg-white text-gray-600'

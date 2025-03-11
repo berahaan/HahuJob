@@ -3,6 +3,8 @@ import BASIC_POSITIONS from "~/graphql/query/BASIC_POSITIONS.graphql";
 import BASIC_SECTORS from "~/graphql/query/BASIC_SECTORS.graphql";
 import BASIC_CITY from "~/graphql/query/BASIC_CITY.graphql";
 const { state, handleSectorsId } = useJobs();
+const { setSectors } = useFilters();
+// setting the fucntions to updates sectors here
 const topJoblist = reactive({
   showDropdown: false,
   mainInputSearch: "",
@@ -343,7 +345,7 @@ onMounted(async () => {
           :class="[
             colorStore.colorMode === 'light' ? 'text-gray-700 font-bold' : '',
           ]"
-          @click="handleSectorsId(sector?.id, sector?.name)"
+          @click="setSectors(sector.id)"
           class="py-2 px-3 cursor-pointer border-b-2 text-[13px]"
         >
           {{ sector?.name }}
