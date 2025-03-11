@@ -2,16 +2,21 @@
 import Sidebar from "./Sidebar.vue";
 import TopJoblist from "./TopJoblist.vue";
 const colorStore = useColorModeStore();
-const { state, correctTypeNm } = useJobs();
-const { buildFilters } = useJobFIlters();
-
+const { state } = useJobs();
 const truncateText = (html, limit) => {
+  console.log("truncate texts ....");
   // Remove HTML tags
   const plainText = html?.replace(/<\/?[^>]+(>|$)/g, "") || "";
   // Truncate text safely
   return plainText.length > limit
     ? plainText.substring(0, limit) + "..."
     : plainText;
+};
+const correctTypeNm = (type) => {
+  return type
+    .split(/[_\s]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+    .join(" ");
 };
 // call useQuery here for ferching data
 </script>

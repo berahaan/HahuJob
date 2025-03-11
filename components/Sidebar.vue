@@ -1,8 +1,9 @@
 <script setup>
 import Vue3Slider from "vue-3-slider-component";
 const colorStore = useColorModeStore();
+import { correctTypeNm } from "../utils/textUtils";
 const { selectRegions, selectedRegionIds } = useRegionSelected();
-const { handleFilterClicked, state, correctTypeNm } = useJobs();
+const { state } = useJobs();
 const checkSelectedExper = () => {
   state.isSelcExpTen = !state.isSelcExpTen;
   if (state.isSelcExpTen) {
