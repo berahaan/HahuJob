@@ -1,5 +1,5 @@
 query MyQuery($filter: jobs_bool_exp, $limit: Int, $offset: Int) {
-  jobs_aggregate(where: $filter) {
+  totalJobs: jobs_aggregate(where: $filter) {
     aggregate {
       count(distinct: true)
     }

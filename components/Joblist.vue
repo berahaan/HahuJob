@@ -13,7 +13,6 @@ const { state } = useJobs();
     <Sidebar />
     <div class="overflow-y-auto h-screen w-full">
       <TopJoblist />
-
       <div
         :class="[
           colorStore.colorMode === 'light'

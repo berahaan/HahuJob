@@ -1,41 +1,45 @@
-import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-
+import { sharedFilters } from "#imports";
 export const useFilters = () => {
   const route = useRoute();
   const router = useRouter();
-
-  // Filters State all in one reactive variables
-  const filterControllers = ref({
-    sectorId: route.query.sid || "",
-    positionId: route.query.pid || "",
-    cityId: route.query.cid || "",
-  });
-
+  // set the selected sectors from dropdown
+  const setSectors = async (sectorId) => {
+    sharedFilters.filterControllers.sectorId = sectorId;
+  };
+  // set selected Positions name from a dropdown menus
+  const setPositions = async (positionId) => {
+    sharedFilters.filterControllers.isPositionsSelected = true;
+    sharedFilters.filterControllers.positionId = positionId;
+  };
+  // set selected city and then fetch jobs accordingly
+  const setCitys = async (city) => {
+    sharedFilters.filterControllers.cityId = city;
+  };
   // Build Filters logic used to be sent for a graphqls query
   const buildFilters = computed(() => {
     const filters = {};
-    if (filterControllers.value.sectorId) {
+    if (sharedFilters.filterControllers.sectorId || route.query.sid) {
       filters.sub_sector = {
         sector: {
           id: {
-            _eq: filterControllers.value.sectorId,
+            _eq: sharedFilters.filterControllers.sectorId || route.query.sid,
           },
         },
       };
     }
-    if (filterControllers.value.positionId) {
+    if (sharedFilters.filterControllers.positionId || route.query.pid) {
       filters.position = {
         id: {
-          _eq: filterControllers.value.positionId,
+          _eq: sharedFilters.filterControllers.positionId || route.query.pid,
         },
       };
     }
-    if (filterControllers.value.cityId) {
+    if (sharedFilters.filterControllers.cityId || route.query.cid) {
       filters.job_cities = {
         city: {
           id: {
-            _eq: filterControllers.value.cityId,
+            _eq: sharedFilters.filterControllers.cityId || route.query.cid,
           },
         },
       };
@@ -43,43 +47,48 @@ export const useFilters = () => {
     console.log("Filters :", filters);
     return filters;
   });
-  //   set the selected sectors from dropdown
-  const setSectors = (sectorId) => {
-    console.log("Set sectors inside filters now ", sectorId);
-    filterControllers.value.sectorId = sectorId;
-    updateRoute();
-  };
 
   // Sync URL with Filters (Route Management)
   const updateRoute = () => {
-    console.log("Updating routes ...");
+    console.log("Updating routes now ...");
+    if (!route) {
+      console.log("Routes undefined skipping ");
+      return;
+    }
+    // build query for routes purposes
     const queryParams = {
       ...route.query,
-      ...(filterControllers.value.sectorId && {
-        sid: filterControllers.value.sectorId,
+      ...(sharedFilters.filterControllers.sectorId && {
+        sid: sharedFilters.filterControllers.sectorId,
       }),
-      ...(filterControllers.value.positionId && {
-        pid: filterControllers.value.positionId,
+      ...(sharedFilters.filterControllers.positionId && {
+        pid: sharedFilters.filterControllers.positionId,
       }),
-      ...(filterControllers.value.cityId && {
-        cid: filterControllers.value.cityId,
+      ...(sharedFilters.filterControllers.cityId && {
+        cid: sharedFilters.filterControllers.cityId,
       }),
     };
-
+    const page = queryParams.page || 1;
+    delete queryParams.page;
     // Remove empty keys from queryParams
     Object.keys(queryParams).forEach((key) => {
       if (!queryParams[key]) delete queryParams[key];
     });
 
-    router.push({ query: queryParams });
+    const sortedQueryParams = { ...queryParams, page };
+    console.log("routes updated  now is ::", sortedQueryParams);
+    router.push({ query: sortedQueryParams });
   };
-  // Watchers for Auto Route Updates
-  watch(filterControllers, updateRoute, { deep: true });
-
+  // watch for anychanges of filtecontrollers here from a shared filters composables
+  watch(() => sharedFilters.filterControllers, updateRoute, { deep: true });
+  // export for other composables or components
   return {
-    filterControllers,
+    filterControllers: sharedFilters.filterControllers,
     buildFilters,
     setSectors,
+    setPositions,
     updateRoute,
+    setCitys,
+    isPositionsSelected: sharedFilters.filterControllers.isPositionsSelected,
   };
 };

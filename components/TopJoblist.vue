@@ -2,8 +2,11 @@
 import BASIC_POSITIONS from "~/graphql/query/BASIC_POSITIONS.graphql";
 import BASIC_SECTORS from "~/graphql/query/BASIC_SECTORS.graphql";
 import BASIC_CITY from "~/graphql/query/BASIC_CITY.graphql";
-const { state, handleSectorsId } = useJobs();
-const { setSectors } = useFilters();
+import SEARCH_POSITIONS from "~/graphql/query/SEARCH_POSITIONS.graphql";
+import SEARCH_SECTORS from "~/graphql/query/SEARCH_SECTORS.graphql";
+import SEARCH_CITY from "~/graphql/query/SEARCH_CITY.graphql";
+const { state } = useJobs();
+const { setSectors, setPositions, setCitys } = useFilters();
 // setting the fucntions to updates sectors here
 const topJoblist = reactive({
   showDropdown: false,
@@ -25,23 +28,38 @@ const storeJobFilters = reactive({
   isTitleClicked: false,
   isCityOpen: false,
 });
+// functions used to call the setsectors to selected sectors ids
+const updateSectors = (sectorId) => {
+  setSectors(sectorId);
+};
+// functions used to calll the setPositions for selected positions
+const updatePositions = (position) => {
+  setPositions(position);
+};
+const updateCity = (city) => {
+  setCitys(city);
+};
 const colorStore = useColorModeStore();
-const togglePositions = () => {
+const togglePositions = async () => {
   console.log("toggle positions clicked now ....");
   storeJobFilters.isPositionOpen = !storeJobFilters.isPositionOpen;
   storeJobFilters.isCityOpen = false;
   storeJobFilters.isTitleClicked = false;
+  await fetchBasicPositions();
 };
-const toggleCity = () => {
+const toggleCity = async () => {
   storeJobFilters.isCityOpen = !storeJobFilters.isCityOpen;
   storeJobFilters.isPositionOpen = false;
   storeJobFilters.isTitleClicked = false;
+  await fetchCities();
 };
 
-const handleTitleClick = () => {
+const handleTitleClick = async () => {
+  console.log("sectors clicked ");
   storeJobFilters.isTitleClicked = !storeJobFilters.isTitleClicked;
   storeJobFilters.isCityOpen = false;
   storeJobFilters.isPositionOpen = false;
+  await fetchSectors();
 };
 
 const fetchCities = async () => {
@@ -93,10 +111,64 @@ const fetchSectors = async () => {
     console.error("Error fetching sectors:", error);
   }
 };
-onMounted(async () => {
-  console.log("onmounting....");
-  await Promise.all([fetchBasicPositions(), fetchSectors(), fetchCities()]);
-});
+
+const searchPositions = async () => {
+  if (topJoblist.PositionSearch) {
+    const { data } = await useAsyncQuery({
+      query: SEARCH_POSITIONS,
+      variables: { PositionSrch: `%${topJoblist.PositionSearch}%` },
+    });
+    if (data.value?.basic_positions) {
+      console.log("Positions searching now ...");
+      storeJobFilters.basicPositions = data.value.basic_positions;
+    } else {
+      console.log("No Positions found.");
+      storeJobFilters.basicPositions = [];
+    }
+  } else {
+    console.log("input is clear ...");
+    // basicPositions.value = [];
+  }
+};
+//
+const searchSectors = async () => {
+  if (topJoblist.sectorSearch) {
+    const { data } = await useAsyncQuery({
+      query: SEARCH_SECTORS,
+      variables: { SectorName: `%${topJoblist.sectorSearch}%` },
+    });
+    if (data.value?.basic_sectors) {
+      storeJobFilters.basicSectors = data.value?.basic_sectors;
+    } else {
+      console.log("No cities found.");
+      storeJobFilters.basicSectors = [];
+    }
+  } else {
+    console.log("input is clear now ...");
+    fetchSectors();
+  }
+};
+const searchCity = async () => {
+  try {
+    if (topJoblist.citySearch) {
+      const { data } = await useAsyncQuery({
+        query: SEARCH_CITY,
+        variables: { CityName: `%${topJoblist.citySearch}%` },
+      });
+      if (data.value?.basic_cities) {
+        storeJobFilters.baseCity = data.value.basic_cities;
+      } else {
+        console.log("No cities found.");
+        storeJobFilters.baseCity = [];
+      }
+    } else {
+      console.log("Input is empty, clearing dropdown.");
+      fetchCities();
+    }
+  } catch (error) {
+    console.error("error while searching for city ", error);
+  }
+};
 </script>
 
 <template>
@@ -237,7 +309,7 @@ onMounted(async () => {
           type="text"
           v-model="topJoblist.PositionSearch"
           @click.stop
-          @input="HandlePositionInput"
+          @input="searchPositions"
           class="w-[11rem] ml-3 md:py-2 lg:py-1 outline-none p-1 rouded-lg bg-transparent"
           placeholder="search..."
         />
@@ -245,7 +317,7 @@ onMounted(async () => {
       <div class="mt-2">
         <div
           v-for="position in storeJobFilters.basicPositions"
-          @click="HandlePositionId(position?.name, position?.id)"
+          @click="updatePositions(position?.id)"
           :key="position.id"
           :class="[
             colorStore.colorMode === 'light' ? 'text-gray-700 font-bold' : '',
@@ -256,6 +328,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <!-- for city dropdown here is it  -->
     <div
       v-if="storeJobFilters.isCityOpen"
       :class="[
@@ -263,15 +336,17 @@ onMounted(async () => {
           ? 'bg-white text-gray-500 border-t-white'
           : 'bg-gray-600 text-white border-t-gray-600',
       ]"
-      class="absolute border cursor-pointer md:py-1 lg:py-0 w-[324px] mt-[17rem] lg:mt-[277.5px] md:mt-[11rem] md:left-[84px] z-50 lg:left-[953px] right-0 left-10 lg:max-h-[15rem] md:max-h-[23rem] overflow-y-auto lg:w-[15rem] md:w-[40rem]"
+      class="absolute scroll-smooth left-[39px] md:mt-0 lg:mt-0 border overflow-y-auto max-h-[15rem] border-teal-400 mt-[20rem] z-50 lg:left-[59.6rem] right-0 w-[20rem] md:w-[40rem] lg:w-[15rem] md:left-[85px] md:top-[180px] lg:top-[66px]"
     >
-      <p class="rounded-lg mx-2 mt-2 border border-teal-500 flex items-center">
+      <p
+        class="rounded-lg mx-2 md:py-1 lg:py-[1px] mt-3 border border-teal-500"
+      >
         <input
           type="text"
           v-model="topJoblist.citySearch"
           @click.stop
-          @input="HandLeCitySearch"
-          class="w-[11rem] lg:ml-3 md:ml-3 py-2 outline-none md:placeholder:text-[18px] lg:placeholder:text-[14px] lg:py-[2px] md:py-[10px] rouded-lg bg-transparent"
+          @input="searchCity"
+          class="w-[11rem] ml-3 md:py-2 lg:py-1 outline-none p-1 rouded-lg bg-transparent"
           placeholder="search..."
         />
       </p>
@@ -284,7 +359,7 @@ onMounted(async () => {
           :class="[
             colorStore.colorMode === 'light' ? 'text-gray-700 font-bold' : '',
           ]"
-          @click="HandleCtyFiltr(city.id, city?.name)"
+          @click="updateCity(city.id)"
           class="py-2 px-3 md:mt-1 cursor-pointer md:font-bold border-b-2 lg:text-[13px] md:text-[17px]"
         >
           {{ city?.name }}
@@ -332,24 +407,30 @@ onMounted(async () => {
         <input
           type="text"
           v-model="topJoblist.sectorSearch"
-          @input="HandLeSectorSearch"
+          @input="searchSectors"
           @click.stop
           class="w-full lg:placeholder:text-sm placeholder:text-[20px] outline-none focus:outline-none bg-transparent border-none px-4"
           placeholder="search..."
         />
       </p>
-      <div class="mt-2">
+      <div class="mt-2" v-if="storeJobFilters.basicSectors.length > 0">
         <div
           v-for="sector in storeJobFilters.basicSectors"
           :key="sector.id"
           :class="[
             colorStore.colorMode === 'light' ? 'text-gray-700 font-bold' : '',
           ]"
-          @click="setSectors(sector.id)"
+          @click="updateSectors(sector.id)"
           class="py-2 px-3 cursor-pointer border-b-2 text-[13px]"
         >
           {{ sector?.name }}
         </div>
+      </div>
+      <div v-else class="mt-2 flex items-center justify-center mb-2">
+        No Sectors found for
+        <span class="text-red-400 font-[400] text-[20px] px-2">{{
+          topJoblist.sectorSearch
+        }}</span>
       </div>
     </div>
     <!-- div for titles-->

@@ -1,9 +1,11 @@
 import { reactive } from "vue";
 import { useRoute } from "vue-router";
 import jobsQuery from "../graphql/query/Jobs.graphql";
+import { sharedFilters } from "#imports";
 export const useJobs = () => {
   const { runWithContext } = useNuxtApp();
-  const { buildFilters, filterControllers } = useFilters();
+
+  const { buildFilters, filterControllers, isPositionsSelected } = useFilters();
   const route = useRoute();
   const storeJobFilters = reactive({
     basicPositions: [],
@@ -28,7 +30,7 @@ export const useJobs = () => {
     checkFilter: true,
     pagination: {
       currentPage: parseInt(route.query.page),
-      pageSize: 12,
+      pageSize: 4,
       totalJobs: 0,
       totalPages: 1,
       offset: 0,
@@ -44,17 +46,26 @@ export const useJobs = () => {
     sectorSearch: "",
     mainSearchJobs: [],
   });
+  filterControllers.value = {
+    sectorId: route.query.sid || "",
+    positionId: route.query.pid || "",
+    cityId: route.query.cid || "",
+  };
   const closeMainSearch = () => {
     topJoblist.mainInputSearch = "";
   };
+
   // variables to be passed to graphqls
-  const variables = computed(() => ({
-    filter: buildFilters.value,
-    limit: state.pagination.pageSize,
-    offset: (state.pagination.currentPage - 1) * state.pagination.pageSize,
-  }));
+  const variables = computed(() => {
+    return {
+      filter: buildFilters.value,
+      limit: 10,
+      offset: 0,
+    };
+  });
+
   if (import.meta.client) {
-    console.log("inside of usejobs now ", variables.value);
+    console.log("inside of usejobs now ", buildFilters.value);
     runWithContext(() => {
       console.log("variables to be passed here ", variables.value);
       // calling useQuery for fetching data
@@ -63,8 +74,18 @@ export const useJobs = () => {
       onResult(({ data }) => {
         if (!data) {
           state.jobs = [];
+        } else if (isPositionsSelected || route.query.pid) {
+          console.log("positions is selected ....");
+          storeJobFilters.holdPositionName = data.jobs[0]?.position.name;
+          state.jobs = data.jobs || [];
+          console.log("Jobs::", state.jobs);
+          state.pagination.totalJobs = data.totalJobs.aggregate.count;
         } else {
           state.jobs = data.jobs || [];
+          state.pagination.totalJobs = data.totalJobs.aggregate.count;
+          console.log(
+            `totalJobs exist ${sharedFilters.filterControllers.sectorId} is ${data.totalJobs.aggregate.count}`
+          );
         }
         state.isLoading = false; // Loading stops after data is received
       });
@@ -74,30 +95,31 @@ export const useJobs = () => {
         state.error = error.message;
         state.isLoading = false;
       });
-      // watch for changes in filter controllers and react accordingly
-      watch(
-        () => variables.value,
-        () => {
-          console.log("Triggered Refetch"); // Debugging
-          state.isLoading = true;
-          refetch();
-        },
-        { deep: true }
-      );
 
       onMounted(() => {
-        state.isLoading = true;
+        console.log("inside of context mounting ", route.query);
         filterControllers.value = {
           sectorId: route.query.sid || "",
           positionId: route.query.pid || "",
           cityId: route.query.cid || "",
         };
+        state.isLoading = true;
         state.pagination.currentPage = parseInt(route.query.page) || 1;
         refetch();
       });
     });
   }
-
+  onMounted(() => {
+    console.log("on mounting in useJobs ", route.query);
+    filterControllers.value = {
+      sectorId: route.query.sid || "",
+      positionId: route.query.pid || "",
+      cityId: route.query.cid || "",
+    };
+  });
+  watch(filterControllers.value, (newfilters) => {
+    console.log("newFilters in useJobs  ", newfilters);
+  });
   return {
     state,
     topJoblist,
