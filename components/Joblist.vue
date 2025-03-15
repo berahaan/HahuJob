@@ -43,14 +43,12 @@ const { state } = useJobs();
           </p>
         </div>
       </div>
-      <div :class="[state.jobs.length === 0 ? 'mt-[6rem]' : '']">
-        Showing {{ state.pagination.totalJobs || 0 }} Joblist now ....
-      </div>
+      <div>Showing {{ state.pagination.totalJobs || 0 }} Joblist now ....</div>
       <div v-if="state.isLoading" class="mt-[2rem]">
         <loading />
       </div>
       <div
-        v-else-if="state.jobs.length === 0"
+        v-else-if="state.jobs.length === 0 && state.isDataFetched"
         class="flex flex-col justify-center items-center mb-[12rem] mt-[4rem]"
       >
         <img
@@ -62,9 +60,10 @@ const { state } = useJobs();
           Sorry, we couldn’t find any match for your search
         </p>
       </div>
+
       <div
         v-else
-        class="grid grid-cols-1 h-screen w-full gap-x-1 lg:grid-cols-3 xl:gap-4 md:grid-col-2 xl:grid-col-2 2xl:grid-col-2"
+        class="grid grid-cols-1 mt-4 h-screen w-full gap-x-1 lg:grid-cols-3 xl:gap-4 md:grid-col-2 xl:grid-col-2 2xl:grid-col-2"
       >
         <div
           v-for="job in state.jobs"
@@ -74,11 +73,10 @@ const { state } = useJobs();
               ? 'bg-white hover:border-teal-500 rounded-md border-white'
               : 'bg-gray-800 hover:border-teal-500 rounded-md ',
           ]"
-          class="relative w-[390px] cursor-pointer flex items-center justify-self-center md:w-[34rem] lg:w-[394px] mb-[1px] border-gray-800 mt-4 rounded-md border hover:border-teal-600"
+          class="w-[390px] cursor-pointer h-[29rem] flex items-center md:w-[34rem] lg:w-[394px] border-gray-800 rounded-md border hover:border-teal-600"
         >
-          <div class="p-4">
+          <div class="p-2">
             <!-- Job Card Header -->
-
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-1">
                 <svg

@@ -14,10 +14,26 @@ export const useFilters = () => {
   };
   // set selected city and then fetch jobs accordingly
   const setCitys = async (city) => {
+    sharedFilters.filterControllers.isCitySelected = true;
     sharedFilters.filterControllers.cityId = city;
+  };
+  const closeSelectedPostn = async () => {
+    const updatedQuery = { ...route.query };
+    delete updatedQuery.pid;
+    console.log("updatedQuery due to Positions ", updatedQuery);
+    await router.push({ query: updatedQuery });
+    sharedFilters.filterControllers.holdPositionName = "";
+  };
+  const closeSelectedCity = async () => {
+    const updatedQuery = { ...route.query };
+    delete updatedQuery.cid;
+    console.log("updatedQuery due to Positions ", updatedQuery);
+    await router.push({ query: updatedQuery });
+    sharedFilters.filterControllers.holdCityName = "";
   };
   // Build Filters logic used to be sent for a graphqls query
   const buildFilters = computed(() => {
+    console.log("inside buildFilters due to changes ");
     const filters = {};
     if (sharedFilters.filterControllers.sectorId || route.query.sid) {
       filters.sub_sector = {
@@ -81,14 +97,20 @@ export const useFilters = () => {
   };
   // watch for anychanges of filtecontrollers here from a shared filters composables
   watch(() => sharedFilters.filterControllers, updateRoute, { deep: true });
+  watch(sharedFilters.filterControllers, (newre) => {
+    console.log("filters is being changing now ....", newre);
+  });
   // export for other composables or components
   return {
     filterControllers: sharedFilters.filterControllers,
     buildFilters,
+    closeSelectedPostn,
     setSectors,
     setPositions,
     updateRoute,
     setCitys,
+    closeSelectedCity,
     isPositionsSelected: sharedFilters.filterControllers.isPositionsSelected,
+    isCitySelected: sharedFilters.filterControllers.isCitySelected,
   };
 };

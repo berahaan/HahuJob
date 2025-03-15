@@ -6,8 +6,23 @@ import SEARCH_POSITIONS from "~/graphql/query/SEARCH_POSITIONS.graphql";
 import SEARCH_SECTORS from "~/graphql/query/SEARCH_SECTORS.graphql";
 import SEARCH_CITY from "~/graphql/query/SEARCH_CITY.graphql";
 const { state } = useJobs();
-const { setSectors, setPositions, setCitys } = useFilters();
+const {
+  setSectors,
+  setPositions,
+  setCitys,
+  filterControllers,
+  closeSelectedPostn,
+  closeSelectedCity,
+} = useFilters();
 // setting the fucntions to updates sectors here
+const handleCLosePostn = () => {
+  console.log("closing postn ...");
+  closeSelectedPostn();
+};
+const handleCityClose = () => {
+  console.log("clicked ");
+  closeSelectedCity();
+};
 const topJoblist = reactive({
   showDropdown: false,
   mainInputSearch: "",
@@ -239,10 +254,10 @@ const searchCity = async () => {
       class="relative rounded-md md:rounded-none lg:inline-flex ml-2 flex cursor-default items-center justify-between lg:w-[15rem] md:w-[40rem] w-[20rem] px-3 py-[4px] md:py-[4px] lg:py-1"
     >
       <p
-        v-if="storeJobFilters.holdPositionName"
+        v-if="filterControllers.holdPositionName"
         class="py-[4px] lg:text-sm md:text-[20px] text-lg"
       >
-        {{ storeJobFilters.holdPositionName }}
+        {{ filterControllers.holdPositionName }}
       </p>
 
       <p
@@ -252,15 +267,15 @@ const searchCity = async () => {
       >
         Select positions
       </p>
-      <p v-if="storeJobFilters.holdPositionName">
+      <p v-if="filterControllers.holdPositionName">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          @click="handleCLoseButton('position')"
+          @click="handleCLosePostn()"
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-3 cursor-pointer"
+          class="size-4 cursor-pointer"
           :class="[
             colorStore.colorMode === 'light' ? 'text-gray-500' : 'text-white',
           ]"
@@ -272,7 +287,7 @@ const searchCity = async () => {
           />
         </svg>
       </p>
-      <p v-if="!storeJobFilters.holdPositionName">
+      <p v-if="!filterControllers.holdPositionName">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -511,23 +526,23 @@ const searchCity = async () => {
       class="ml-2 flex rounded-md md:rounded-none lg:inline-flex cursor-default items-center justify-between lg:w-[15rem] md:w-[40rem] w-[20rem] px-4 py-1 md:py-[4px] lg:py-1"
     >
       <p
-        v-if="storeJobFilters.holdCityName"
+        v-if="filterControllers.holdCityName"
         class="py-[4px] lg:text-sm md:text-[20px] text-[16px]"
       >
-        {{ storeJobFilters.holdCityName }}
+        {{ filterControllers.holdCityName }}
       </p>
       <p
-        v-if="!storeJobFilters.holdCityName"
+        v-if="!filterControllers.holdCityName"
         class="py-[4px] lg:text-sm md:text-[20px] text-[16px]"
       >
         Select city
       </p>
-      <p v-if="storeJobFilters.holdCityName">
+      <p v-if="filterControllers.holdCityName">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          @click="handleCLoseButton('city')"
+          @click="handleCityClose()"
           stroke-width="1.5"
           stroke="currentColor"
           class="size-3 cursor-pointer"

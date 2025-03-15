@@ -26,6 +26,7 @@ query MyQuery($filter: jobs_bool_exp, $limit: Int, $offset: Int) {
     }
     job_cities {
       city {
+        id
         name
       }
     }

@@ -5,7 +5,12 @@ import { sharedFilters } from "#imports";
 export const useJobs = () => {
   const { runWithContext } = useNuxtApp();
 
-  const { buildFilters, filterControllers, isPositionsSelected } = useFilters();
+  const {
+    buildFilters,
+    filterControllers,
+    isPositionsSelected,
+    isCitySelected,
+  } = useFilters();
   const route = useRoute();
   const storeJobFilters = reactive({
     basicPositions: [],
@@ -19,7 +24,7 @@ export const useJobs = () => {
     isTitleClicked: false,
     isCityOpen: false,
   });
-
+  // declaring variables to be used
   const state = reactive({
     jobs: [],
     selectedALlJobTypes: [],
@@ -36,6 +41,7 @@ export const useJobs = () => {
       offset: 0,
     },
     isLoading: false,
+    isDataFetched: false,
     error: null,
   });
   const topJoblist = reactive({
@@ -65,7 +71,6 @@ export const useJobs = () => {
   });
 
   if (import.meta.client) {
-    console.log("inside of usejobs now ", buildFilters.value);
     runWithContext(() => {
       console.log("variables to be passed here ", variables.value);
       // calling useQuery for fetching data
@@ -74,20 +79,37 @@ export const useJobs = () => {
       onResult(({ data }) => {
         if (!data) {
           state.jobs = [];
-        } else if (isPositionsSelected || route.query.pid) {
-          console.log("positions is selected ....");
-          storeJobFilters.holdPositionName = data.jobs[0]?.position.name;
-          state.jobs = data.jobs || [];
-          console.log("Jobs::", state.jobs);
-          state.pagination.totalJobs = data.totalJobs.aggregate.count;
         } else {
           state.jobs = data.jobs || [];
           state.pagination.totalJobs = data.totalJobs.aggregate.count;
-          console.log(
-            `totalJobs exist ${sharedFilters.filterControllers.sectorId} is ${data.totalJobs.aggregate.count}`
-          );
+          console.log("Jobs ", state.jobs);
+          // Handle Position Selection
+          if (isPositionsSelected || route.query.pid) {
+            console.log("positions is selected ....");
+            const positionName = data.jobs[0]?.position.name || null;
+            filterControllers.holdPositionName = positionName;
+          }
+
+          // Handle City Selection
+          if (isCitySelected || route.query.cid) {
+            console.log("city is selected ....");
+            const cityName = data.jobs[0]?.job_cities[0].city.name || null;
+            filterControllers.holdCityName = cityName;
+          }
+
+          // Reset if no selection
+          if (
+            !isPositionsSelected &&
+            !route.query.pid &&
+            !isCitySelected &&
+            !route.query.cid
+          ) {
+            storeJobFilters.holdPositionName = null;
+            sharedFilters.filterControllers.holdCityName = null;
+          }
         }
-        state.isLoading = false; // Loading stops after data is received
+
+        state.isLoading = false;
       });
       // check for errors
       onError((error) => {
@@ -97,29 +119,30 @@ export const useJobs = () => {
       });
 
       onMounted(() => {
-        console.log("inside of context mounting ", route.query);
+        state.isLoading = true;
+        state.isDataFetched = false;
         filterControllers.value = {
           sectorId: route.query.sid || "",
           positionId: route.query.pid || "",
           cityId: route.query.cid || "",
         };
-        state.isLoading = true;
         state.pagination.currentPage = parseInt(route.query.page) || 1;
-        refetch();
+        refetch().finally(() => {
+          state.isLoading = false; // Ensures `isLoading` ends after data or error
+          state.isDataFetched = true;
+        });
       });
     });
   }
   onMounted(() => {
-    console.log("on mounting in useJobs ", route.query);
+    state.isLoading = true;
     filterControllers.value = {
       sectorId: route.query.sid || "",
       positionId: route.query.pid || "",
       cityId: route.query.cid || "",
     };
   });
-  watch(filterControllers.value, (newfilters) => {
-    console.log("newFilters in useJobs  ", newfilters);
-  });
+
   return {
     state,
     topJoblist,
