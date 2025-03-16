@@ -5,7 +5,7 @@ import BASIC_CITY from "~/graphql/query/BASIC_CITY.graphql";
 import SEARCH_POSITIONS from "~/graphql/query/SEARCH_POSITIONS.graphql";
 import SEARCH_SECTORS from "~/graphql/query/SEARCH_SECTORS.graphql";
 import SEARCH_CITY from "~/graphql/query/SEARCH_CITY.graphql";
-const { state } = useJobs();
+const { state } = useJobs()
 const {
   setSectors,
   setPositions,
@@ -16,11 +16,9 @@ const {
 } = useFilters();
 // setting the fucntions to updates sectors here
 const handleCLosePostn = () => {
-  console.log("closing postn ...");
   closeSelectedPostn();
 };
 const handleCityClose = () => {
-  console.log("clicked ");
   closeSelectedCity();
 };
 const topJoblist = reactive({

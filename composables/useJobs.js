@@ -65,7 +65,7 @@ export const useJobs = () => {
   const variables = computed(() => {
     return {
       filter: buildFilters.value,
-      limit: 10,
+      limit: 20,
       offset: 0,
     };
   });
@@ -89,7 +89,6 @@ export const useJobs = () => {
             const positionName = data.jobs[0]?.position.name || null;
             filterControllers.holdPositionName = positionName;
           }
-
           // Handle City Selection
           if (isCitySelected || route.query.cid) {
             console.log("city is selected ....");

@@ -29,7 +29,8 @@ export const useFilters = () => {
     delete updatedQuery.cid;
     console.log("updatedQuery due to Positions ", updatedQuery);
     await router.push({ query: updatedQuery });
-    sharedFilters.filterControllers.holdCityName = "";
+    sharedFilters.filterControllers.holdCityName = null;
+    sharedFilters.filterControllers.cityId = "";
   };
   // Build Filters logic used to be sent for a graphqls query
   const buildFilters = computed(() => {

@@ -6,6 +6,7 @@ export const sharedFilters = reactive({
     positionId: "",
     holdPositionName: "",
     holdCityName: "",
+    holdSectorsName: "",
     cityId: "",
     isPositionsSelected: false,
     isCitySelected: false,

@@ -4,6 +4,7 @@ import TopJoblist from "./TopJoblist.vue";
 import { correctTypeNm, truncateText } from "../utils/textUtils";
 const colorStore = useColorModeStore();
 const { state } = useJobs();
+const { filterControllers } = useFilters();
 
 // call useQuery here for ferching data
 </script>

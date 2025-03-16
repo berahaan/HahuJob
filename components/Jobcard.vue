@@ -332,7 +332,7 @@ const breakpoints = {
                 >
                   <!-- Wider and Longer Triangle Pointer -->
                   <div
-                    class="absolute -left-4 top-28 w-0 h-0 border-t-[12px] border-t-transparent border-b-[24px] border-b-transparent border-r-[12px] border-r-gray-600"
+                    class="absolute -left-2 top-24 w-0 h-0 border-t-[18px] border-t-transparent border-b-[24px] border-b-transparent border-r-[19px] border-r-gray-600"
                   ></div>
 
                   <!-- Content -->
