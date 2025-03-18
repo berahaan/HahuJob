@@ -1,10 +1,10 @@
 <script setup>
 import Sidebar from "./Sidebar.vue";
 import TopJoblist from "./TopJoblist.vue";
+import { sharedFilters } from "#imports";
 import { correctTypeNm, truncateText } from "../utils/textUtils";
 const colorStore = useColorModeStore();
 const { state } = useJobs();
-const { filterControllers } = useFilters();
 
 // call useQuery here for ferching data
 </script>
@@ -45,7 +45,8 @@ const { filterControllers } = useFilters();
         </div>
       </div>
       <div>Showing {{ state.pagination.totalJobs || 0 }} Joblist now ....</div>
-      <div v-if="state.isLoading" class="mt-[2rem]">
+      <div v-if="sharedFilters.isLoading" class="mt-[2rem]">
+        {{ sharedFilters.isLoading }}
         <loading />
       </div>
       <div

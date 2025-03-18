@@ -3,18 +3,24 @@ import { sharedFilters } from "#imports";
 export const useFilters = () => {
   const route = useRoute();
   const router = useRouter();
+
   // set the selected sectors from dropdown
   const setSectors = async (sectorId) => {
+    console.log("setting sectors now ");
     sharedFilters.filterControllers.sectorId = sectorId;
+    sharedFilters.isLoading = true;
+    console.log("sharedFilters.isLoading ", sharedFilters.isLoading);
   };
   // set selected Positions name from a dropdown menus
   const setPositions = async (positionId) => {
+    console.log("setting sectors now ");
     sharedFilters.filterControllers.isPositionsSelected = true;
     sharedFilters.filterControllers.positionId = positionId;
   };
   // set selected city and then fetch jobs accordingly
   const setCitys = async (city) => {
     sharedFilters.filterControllers.isCitySelected = true;
+    sharedFilters.isLoading = true;
     sharedFilters.filterControllers.cityId = city;
   };
   const closeSelectedPostn = async () => {
@@ -22,7 +28,8 @@ export const useFilters = () => {
     delete updatedQuery.pid;
     console.log("updatedQuery due to Positions ", updatedQuery);
     await router.push({ query: updatedQuery });
-    sharedFilters.filterControllers.holdPositionName = "";
+    sharedFilters.filterControllers.holdPositionName = null;
+    sharedFilters.filterControllers.positionId = "";
   };
   const closeSelectedCity = async () => {
     const updatedQuery = { ...route.query };
@@ -98,9 +105,7 @@ export const useFilters = () => {
   };
   // watch for anychanges of filtecontrollers here from a shared filters composables
   watch(() => sharedFilters.filterControllers, updateRoute, { deep: true });
-  watch(sharedFilters.filterControllers, (newre) => {
-    console.log("filters is being changing now ....", newre);
-  });
+
   // export for other composables or components
   return {
     filterControllers: sharedFilters.filterControllers,

@@ -11,4 +11,5 @@ export const sharedFilters = reactive({
     isPositionsSelected: false,
     isCitySelected: false,
   },
+  isLoading: false,
 });

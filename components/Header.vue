@@ -8,7 +8,6 @@ const route = useRoute();
 const isMobileMenuOpen = ref(false);
 const colorStore = useColorModeStore();
 const GotoPage = (id) => {
-  console.log("Clicked id is here ", id);
   trackJob.value = false;
   navigateTo({
     path: "/jobs",
@@ -52,7 +51,6 @@ const { data: basic_sectors, error } = await useAsyncData(
 if (error.value) {
   console.error("Error fetching sectors:", error.value);
 }
-console.log("Fetched sectors:", basic_sectors.value);
 function applyBodyClass(mode) {
   document.body.classList.toggle("bg-customGreen", mode === "dark");
   document.body.classList.toggle("text-white", mode === "dark");

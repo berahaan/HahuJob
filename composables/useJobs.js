@@ -107,7 +107,7 @@ export const useJobs = () => {
             sharedFilters.filterControllers.holdCityName = null;
           }
         }
-
+        sharedFilters.isLoading = false;
         state.isLoading = false;
       });
       // check for errors
@@ -115,10 +115,13 @@ export const useJobs = () => {
         console.error("Error:", error.message);
         state.error = error.message;
         state.isLoading = false;
+        sharedFilters.isLoading = false;
       });
 
       onMounted(() => {
+        console.log("on mounting now ...");
         state.isLoading = true;
+        sharedFilters.isLoading = true;
         state.isDataFetched = false;
         filterControllers.value = {
           sectorId: route.query.sid || "",
@@ -128,6 +131,7 @@ export const useJobs = () => {
         state.pagination.currentPage = parseInt(route.query.page) || 1;
         refetch().finally(() => {
           state.isLoading = false; // Ensures `isLoading` ends after data or error
+          sharedFilters.isLoading = false;
           state.isDataFetched = true;
         });
       });
@@ -135,6 +139,7 @@ export const useJobs = () => {
   }
   onMounted(() => {
     state.isLoading = true;
+    sharedFilters.isLoading = true;
     filterControllers.value = {
       sectorId: route.query.sid || "",
       positionId: route.query.pid || "",
